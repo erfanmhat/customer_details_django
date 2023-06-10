@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block styles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}">
+<style>
+.header {
+    background-image: url('{% static 'image/header_image.jpg' %}');
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 250px;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+
+
+</style>
+{% endblock styles %}
+
+
+{% block jss %}
+<script src="{% static 'js/index.js' %}"></script>
+{% endblock jss %}
+
+
+{% block header %}
+<div class="header">
+    <h1>Welcome to Our Customer Portal</h1>
+    <br><br>
+    <p>Get to know our amazing customers</p>
+    <br>
+    <h2>Customer <b>Details</b></h2>
+</div>
+{% endblock header %}
+
+
+{% block contents %}
+<div class="container-xl">
+    <div class="table-responsive">
+        <div class="table-wrapper">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-2">
+                        <a href="create" class="btn btn-primary">New Customer <i class="fa fa-plus"></i></a>
+                    </div>
+                    <div class="col-sm-2">
+                        <a href="{% url 'customer_index' %}" class="btn btn-secondary">Clear filters <i
+                                class="fa fa-trash"></i></a>
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="search-box">
+                            <i class="material-icons">&#xE8B6;</i>
+                            <input type="text" class="form-control" placeholder="Search&hellip;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-striped table-hover table-bordered">
+                <thead>
+                <tr>
+                    <th># <a href="/customers?order_by=id&page=1&per_page={{request.GET.per_page}}"><i
+                            class="fa fa-sort"></i></a></th>
+                    <th>First name <a href="/customers?order_by=first_name&page=1&per_page={{request.GET.per_page}}"><i
+                            class="fa fa-sort"></i></a></th>
+                    <th>Last name <a href="/customers?order_by=last_name&page=1&per_page={{request.GET.per_page}}"><i
+                            class="fa fa-sort"></i></a></th>
+                    <th>Email <a href="/customers?order_by=email&page=1&per_page={{request.GET.per_page}}"><i
+                            class="fa fa-sort"></i></a></th>
+                    <th>Address <a href="/customers?order_by=address&page=1&per_page={{request.GET.per_page}}"><i
+                            class="fa fa-sort"></i></a></th>
+                    <th>City <a href="/customers?order_by=city&page=1&per_page={{request.GET.per_page}}"><i
+                            class="fa fa-sort"></i></a></th>
+                    <th>Country <a href="/customers?order_by=country&page=1&per_page={{request.GET.per_page}}"><i
+                            class="fa fa-sort"></i></a></th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for customer in page_obj %}
+                <tr>
+                    <td>{{customer.id}}</td>
+                    <td>{{customer.first_name}}</td>
+                    <td>{{customer.last_name}}</td>
+                    <td>{{customer.email}}</td>
+                    <td>{{customer.address}}</td>
+                    <td>{{customer.city}}</td>
+                    <td>{{customer.country}}</td>
+                    <td>
+                        <a href="edit/{{customer.id}}" type="button" class="btn btn-info" title="Edit">Edit <i
+                                class="fa fa-edit"></i></a>
+                        <form method="POST" action="{% url 'delete_customer' customer.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="HTTP_X_METHOD_OVERRIDE" value="DELETE">
+                            <button class="btn btn-danger" title="Delete" type="submit">Delete <i
+                                    class="fa fa-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <div class="clearfix">
+                <div class="hint-text">Showing <b>{{ per_page }}</b> out of <b>{{ total }}</b> entries</div>
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item"><a
+                            href="?page=1&per_page={{request.GET.per_page}}&order_by={{request.GET.order_by}}"><i
+                            class="fa fa-angle-double-left"></i></a></li>
+                    <li class="page-item"><a
+                            href="?page={{ page_obj.previous_page_number }}&order_by={{request.GET.order_by}}&per_page={{request.GET.per_page}}"
+                            class="page-link">{{ page_obj.previous_page_number }}</a></li>
+                    {% endif %}
+                    <li class="page-item active"><a
+                            href="?page={{ page_obj.number }}&order_by={{request.GET.order_by}}&per_page={{request.GET.per_page}}"
+                            class="page-link">{{ page_obj.number }}</a>
+                        {% if page_obj.has_next %}
+                    <li class="page-item"><a
+                            href="?page={{ page_obj.next_page_number }}&order_by={{request.GET.order_by}}&per_page={{request.GET.per_page}}"
+                            class="page-link">{{ page_obj.next_page_number }}</a>
+                    <li class="page-item"><a
+                            href="?page={{ page_obj.paginator.num_pages }}&order_by={{request.GET.order_by}}&per_page={{request.GET.per_page}}"
+                            class="page-link"><i class="fa fa-angle-double-right"></i></a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock contents %}
