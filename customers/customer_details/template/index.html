@@ -6,13 +6,11 @@
 <style>
 .header {
     background-image: url('{% static 'image/header_image.jpg' %}');
-    background-repeat: no-repeat;
-    background-size: cover;
-    height: 250px;
-    color: white;
-    padding: 20px;
-    text-align: center;
 }
+
+
+
+
 
 
 
@@ -22,6 +20,14 @@
 
 {% block jss %}
 <script src="{% static 'js/index.js' %}"></script>
+<script>
+function handleSelectChange(event) {
+    var selectElement = event.target;
+
+    var value = selectElement.value;
+    window.open('?page=1&per_page=' + value + '&order_by={{request.GET.order_by}}&q={{request.GET.q}}', '_self');
+}
+</script>
 {% endblock jss %}
 
 
@@ -38,7 +44,7 @@
 
 {% block contents %}
 <div class="container-xl">
-    <div class="table-responsive">
+    <div class="table-responsive ">
         <div class="table-wrapper">
             <div class="table-title">
                 <div class="row">
@@ -49,7 +55,26 @@
                         <a href="{% url 'customer_index' %}" class="btn btn-secondary">Clear filters <i
                                 class="fa fa-trash"></i></a>
                     </div>
-                    <div class="col-sm-8">
+                    <div class="col-sm-4 inline-form-container">
+                        <form method="GET"
+                              action="?page=1&per_page={{request.GET.per_page}}&order_by={{request.GET.order_by}}&q={{request.GET.q}}">
+                            <label for="per_page_select">elements per page :</label>
+                            <select id="per_page_select" name="per_page" value="{{request.GET.per_page}}"  onchange="handleSelectChange(event)">
+                                {% for per_page_item in per_pages %}
+                                {% if request.GET.per_page %}
+                                <option value="{{per_page_item}}" {% if per_page_item == request.GET.per_page %} selected {% endif %}>
+                                    {{per_page_item}}
+                                </option>
+                                {% else %}
+                                <option value="{{per_page_item}}" {% if per_page_item == '5' %} selected {% endif %}>
+                                    {{per_page_item}}
+                                </option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
+                    <div class="col-sm-4">
                         <div class="search-box">
                             <i class="material-icons">&#xE8B6;</i>
                             <input type="text" class="form-control" placeholder="Search&hellip;">
@@ -60,19 +85,21 @@
             <table class="table table-striped table-hover table-bordered">
                 <thead>
                 <tr>
-                    <th># <a href="/customers?order_by=id&page=1&per_page={{request.GET.per_page}}"><i
+                    <th># <a href="?order_by=id&page=1&per_page={{request.GET.per_page}}&q={{request.GET.q}}"><i
                             class="fa fa-sort"></i></a></th>
-                    <th>First name <a href="/customers?order_by=first_name&page=1&per_page={{request.GET.per_page}}"><i
+                    <th>First name <a
+                            href="?order_by=first_name&page=1&per_page={{request.GET.per_page}}&q={{request.GET.q}}"><i
                             class="fa fa-sort"></i></a></th>
-                    <th>Last name <a href="/customers?order_by=last_name&page=1&per_page={{request.GET.per_page}}"><i
+                    <th>Last name <a
+                            href="?order_by=last_name&page=1&per_page={{request.GET.per_page}}&q={{request.GET.q}}"><i
                             class="fa fa-sort"></i></a></th>
-                    <th>Email <a href="/customers?order_by=email&page=1&per_page={{request.GET.per_page}}"><i
+                    <th>Email <a href="?order_by=email&page=1&per_page={{request.GET.per_page}}&q={{request.GET.q}}"><i
                             class="fa fa-sort"></i></a></th>
-                    <th>Address <a href="/customers?order_by=address&page=1&per_page={{request.GET.per_page}}"><i
+                    <th>Address <a href="?order_by=address&page=1&per_page={{request.GET.per_page}}&q={{request.GET.q}}"><i
                             class="fa fa-sort"></i></a></th>
-                    <th>City <a href="/customers?order_by=city&page=1&per_page={{request.GET.per_page}}"><i
+                    <th>City <a href="?order_by=city&page=1&per_page={{request.GET.per_page}}&q={{request.GET.q}}"><i
                             class="fa fa-sort"></i></a></th>
-                    <th>Country <a href="/customers?order_by=country&page=1&per_page={{request.GET.per_page}}"><i
+                    <th>Country <a href="?order_by=country&page=1&per_page={{request.GET.per_page}}&q={{request.GET.q}}"><i
                             class="fa fa-sort"></i></a></th>
                     <th>Actions</th>
                 </tr>
@@ -87,15 +114,17 @@
                     <td>{{customer.address}}</td>
                     <td>{{customer.city}}</td>
                     <td>{{customer.country}}</td>
-                    <td>
-                        <a href="edit/{{customer.id}}" type="button" class="btn btn-info" title="Edit">Edit <i
-                                class="fa fa-edit"></i></a>
-                        <form method="POST" action="{% url 'delete_customer' customer.id %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="HTTP_X_METHOD_OVERRIDE" value="DELETE">
-                            <button class="btn btn-danger" title="Delete" type="submit">Delete <i
-                                    class="fa fa-trash"></i></button>
-                        </form>
+                    <td style="width: 210px">
+                        <div class="inline-form-container">
+                            <a href="edit/{{customer.id}}" type="button" class="btn btn-info" title="Edit">Edit <i
+                                    class="fa fa-edit"></i></a>
+                            <form method="POST" action="{% url 'delete_customer' customer.id %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="HTTP_X_METHOD_OVERRIDE" value="DELETE">
+                                <button class="btn btn-danger" title="Delete" type="submit">Delete <i
+                                        class="fa fa-trash"></i></button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -106,21 +135,21 @@
                 <ul class="pagination">
                     {% if page_obj.has_previous %}
                     <li class="page-item"><a
-                            href="?page=1&per_page={{request.GET.per_page}}&order_by={{request.GET.order_by}}"><i
+                            href="?page=1&per_page={{request.GET.per_page}}&order_by={{request.GET.order_by}}&q={{request.GET.q}}"><i
                             class="fa fa-angle-double-left"></i></a></li>
                     <li class="page-item"><a
-                            href="?page={{ page_obj.previous_page_number }}&order_by={{request.GET.order_by}}&per_page={{request.GET.per_page}}"
+                            href="?page={{ page_obj.previous_page_number }}&order_by={{request.GET.order_by}}&per_page={{request.GET.per_page}}&q={{request.GET.q}}"
                             class="page-link">{{ page_obj.previous_page_number }}</a></li>
                     {% endif %}
                     <li class="page-item active"><a
-                            href="?page={{ page_obj.number }}&order_by={{request.GET.order_by}}&per_page={{request.GET.per_page}}"
+                            href="?page={{ page_obj.number }}&order_by={{request.GET.order_by}}&per_page={{request.GET.per_page}}&q={{request.GET.q}}"
                             class="page-link">{{ page_obj.number }}</a>
                         {% if page_obj.has_next %}
                     <li class="page-item"><a
-                            href="?page={{ page_obj.next_page_number }}&order_by={{request.GET.order_by}}&per_page={{request.GET.per_page}}"
+                            href="?page={{ page_obj.next_page_number }}&order_by={{request.GET.order_by}}&per_page={{request.GET.per_page}}&q={{request.GET.q}}"
                             class="page-link">{{ page_obj.next_page_number }}</a>
                     <li class="page-item"><a
-                            href="?page={{ page_obj.paginator.num_pages }}&order_by={{request.GET.order_by}}&per_page={{request.GET.per_page}}"
+                            href="?page={{ page_obj.paginator.num_pages }}&order_by={{request.GET.order_by}}&per_page={{request.GET.per_page}}&q={{request.GET.q}}"
                             class="page-link"><i class="fa fa-angle-double-right"></i></a>
                         {% endif %}
                     </li>
