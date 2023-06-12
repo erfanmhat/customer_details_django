@@ -16,8 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect, reverse
+from django.views.generic.base import RedirectView
 
 urlpatterns = [
+    path('favicon.ico', RedirectView.as_view(url='/static/image/favicon.ico', permanent=True)),
     path('admin/', admin.site.urls),
-    path('customers/', include('customer_details.urls'))
+    path('customers/', include('customer_details.urls')),
+    path('', lambda request: redirect(reverse('customer_index')))
 ]

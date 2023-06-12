@@ -9,17 +9,11 @@
 }
 
 
-
-
-
-
-
 </style>
 {% endblock styles %}
 
 
 {% block jss %}
-<script src="{% static 'js/index.js' %}"></script>
 <script>
 function handleSelectChange(event) {
     var selectElement = event.target;
@@ -27,6 +21,11 @@ function handleSelectChange(event) {
     var value = selectElement.value;
     window.open('?page=1&per_page=' + value + '&order_by={{request.GET.order_by}}&q={{request.GET.q}}', '_self');
 }
+function search(){
+    var searchInput = document.getElementById("searchInput");
+    window.open('?page=1&per_page={{request.GET.per_page}}&order_by={{request.GET.order_by}}&q=' + searchInput.value, '_self');
+}
+
 </script>
 {% endblock jss %}
 
@@ -76,8 +75,8 @@ function handleSelectChange(event) {
                     </div>
                     <div class="col-sm-4">
                         <div class="search-box">
-                            <i class="material-icons">&#xE8B6;</i>
-                            <input type="text" class="form-control" placeholder="Search&hellip;">
+                            <i onclick="search()" class="fa fa-search"></i>
+                            <input id="searchInput" type="text" class="form-control" placeholder="Search&hellip;">
                         </div>
                     </div>
                 </div>

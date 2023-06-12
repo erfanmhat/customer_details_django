@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.db.models import Q
 
@@ -57,14 +57,36 @@ def create_customer(request):
             return redirect('customer_index')
     else:
         form = CustomerForm()
-    return render(request, 'create_customer.html', {'form': form})
+    return render(
+        request,
+        'create_or_edit_customer.html',
+        {
+            'form': form,
+            'page_type': 'create'
+        }
+    )
 
 
 def edit_customer(request, customer_id):
-    pass
+    customer = get_object_or_404(Customer, id=customer_id)
+    if request.method == 'POST':
+        form = CustomerForm(request.POST, instance=customer)
+        if form.is_valid():
+            form.save()
+            return redirect('customer_index')
+    else:
+        form = CustomerForm(instance=customer)
+    return render(
+        request,
+        'create_or_edit_customer.html',
+        {
+            'form': form,
+            'page_type': 'edit'
+        }
+    )
 
 
 def delete_customer(request, customer_id):
     if request.method == 'POST' and request.POST.get('HTTP_X_METHOD_OVERRIDE') == "DELETE":
-        Customer.objects.get(id=customer_id).delete()
+        get_object_or_404(Customer, id=customer_id).delete()
     return redirect('customer_index')

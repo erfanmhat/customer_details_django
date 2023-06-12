@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block styles %}
+<style>
+.header {
+    background-image: url('{% static 'image/header_image.jpg' %}');
+}
+
+
+
+</style>
+{% endblock styles %}
+
+
+{% block jss %}
+
+{% endblock jss %}
+
+
+{% block header %}
+<div class="header">
+    <h1>Customer Portal</h1>
+    <br><br><br><br>
+    <h2>
+        {% if page_type == 'create' %}
+        Create Customer
+        {% else %}
+        Edit Customer
+        {% endif %}
+    </h2>
+</div>
+{% endblock header %}
+
+
+{% block contents %}
+<div class="container">
+    <div class="row justify-content-center" style="margin:30px 0px;">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}" class="custom-label">{{ field.label }}</label>
+                            {{ field|add_class:"form-control" }}
+                            {% if field.errors %}
+                            {% for error in field.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        <div class="form-group text-center">
+                            <button class="btn btn-primary" type="submit">
+                                {% if page_type == 'create' %}
+                                Create
+                                {% else %}
+                                Edit
+                                {% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock contents %}
